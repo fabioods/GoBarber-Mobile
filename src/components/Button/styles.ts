@@ -9,10 +9,15 @@ export const Container = styled(RectButton)`
   justify-content: center;
   align-items: center;
   margin-top: 8px;
+  flex-direction: row;
 `;
 
 export const ButtonText = styled.Text`
   font-family: 'RobotoSlab-Medium';
   color: #312e38;
   font-size: 18px;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 `;
