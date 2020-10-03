@@ -3,6 +3,8 @@ import React, {
   useRef,
   useImperativeHandle,
   forwardRef,
+  useState,
+  useCallback,
 } from 'react';
 
 import { TextInputProps } from 'react-native';
@@ -30,6 +32,17 @@ const Input: React.ForwardRefRenderFunction<InputRef, InputProps> = (
   const inputElementRef = useRef<any>(null);
   const { registerField, defaultValue = '', fieldName, error } = useField(name);
   const inputValueRef = useRef<InputValueRef>({ value: defaultValue });
+  const [isFocused, setIsFocused] = useState(false);
+  const [isFilled, setIsFilled] = useState(false);
+
+  const handleInputFocus = useCallback(() => {
+    setIsFocused(true);
+  }, []);
+
+  const handleInputBlur = useCallback(() => {
+    setIsFocused(false);
+    setIsFilled(!!inputValueRef.current.value);
+  }, []);
 
   /**
    * Permite que o componente filho envie informações para o componente pai.
@@ -57,12 +70,18 @@ const Input: React.ForwardRefRenderFunction<InputRef, InputProps> = (
   }, [fieldName, registerField]);
 
   return (
-    <Container>
-      <InputIcon name={icon} size={20} color="#666360" />
+    <Container isFocused={isFocused} isFilled={isFilled}>
+      <InputIcon
+        name={icon}
+        size={20}
+        color={isFocused || isFilled ? '#FF9000' : '#666360'}
+      />
 
       <TextInput
         {...rest}
         ref={inputElementRef}
+        onFocus={handleInputFocus}
+        onBlur={handleInputBlur}
         keyboardAppearance="dark"
         placeholderTextColor="#666360"
         defaultValue={defaultValue}
