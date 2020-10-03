@@ -22,7 +22,7 @@ import {
   CreateAccountButtonText,
 } from './styles';
 import logoImg from '../../assets/logo.png';
-
+import { useAuth } from '../../hooks/Auth';
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 import getValidationErros from '../../utils/getValidationErrors';
@@ -35,33 +35,38 @@ interface FormProps {
 const SignIn: React.FC = () => {
   const navigation = useNavigation();
   const passwordInputRef = useRef<TextInput>(null);
+  const authContext = useAuth();
 
-  const handleOnSubmit = useCallback(async (data: FormProps) => {
-    try {
-      formRef.current?.setErrors({});
-      const schema = Yup.object().shape({
-        email: Yup.string()
-          .required('Digite seu email.')
-          .email('Digite um e-mail válido.'),
-        password: Yup.string().required('Digite sua senha'),
-      });
-      await schema.validate(data, { abortEarly: false });
-      // await authContext.signIn({
-      //   email: data.email,
-      //   password: data.password,
-      // });
-    } catch (error) {
-      if (error instanceof Yup.ValidationError) {
-        const errors = getValidationErros(error);
-        formRef.current?.setErrors(errors);
-        return;
+  const handleOnSubmit = useCallback(
+    async (data: FormProps) => {
+      try {
+        formRef.current?.setErrors({});
+        const schema = Yup.object().shape({
+          email: Yup.string()
+            .required('Digite seu email.')
+            .email('Digite um e-mail válido.'),
+          password: Yup.string().required('Digite sua senha'),
+        });
+        await schema.validate(data, { abortEarly: false });
+        await authContext.signIn({
+          email: data.email,
+          password: data.password,
+        });
+        Alert.alert('Deu boa, vc logou');
+      } catch (error) {
+        if (error instanceof Yup.ValidationError) {
+          const errors = getValidationErros(error);
+          formRef.current?.setErrors(errors);
+          return;
+        }
+        Alert.alert(
+          'Erro na autenticação',
+          'Falha ao se autenticar, tente novamente!',
+        );
       }
-      Alert.alert(
-        'Erro na autenticação',
-        'Falha ao se autenticar, tente novamente!',
-      );
-    }
-  }, []);
+    },
+    [authContext],
+  );
 
   const formRef = useRef<FormHandles>(null);
 
