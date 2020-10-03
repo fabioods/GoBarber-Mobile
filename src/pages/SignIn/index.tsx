@@ -5,6 +5,7 @@ import {
   Platform,
   View,
   ScrollView,
+  TextInput,
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Feather';
@@ -26,6 +27,7 @@ import Button from '../../components/Button';
 
 const SignIn: React.FC = () => {
   const navigation = useNavigation();
+  const passwordInputRef = useRef<TextInput>(null);
   const handleOnSubmit = useCallback((data: object) => {
     console.log(data);
   }, []);
@@ -48,8 +50,29 @@ const SignIn: React.FC = () => {
               <Title>Faça seu Logon</Title>
             </View>
             <Form onSubmit={handleOnSubmit} ref={formRef}>
-              <Input name="email" placeholder="E-mail" icon="mail" />
-              <Input name="password" placeholder="Senha" icon="lock" />
+              <Input
+                autoCapitalize="none"
+                autoCorrect={false}
+                keyboardType="email-address"
+                name="email"
+                placeholder="E-mail"
+                icon="mail"
+                returnKeyType="next"
+                onSubmitEditing={() => {
+                  passwordInputRef.current?.focus();
+                }}
+              />
+              <Input
+                ref={passwordInputRef}
+                secureTextEntry
+                name="password"
+                placeholder="Senha"
+                icon="lock"
+                returnKeyType="send"
+                onSubmitEditing={() => {
+                  formRef.current?.submitForm();
+                }}
+              />
               <Button
                 onPress={() => {
                   formRef.current?.submitForm();
