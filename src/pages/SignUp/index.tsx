@@ -6,26 +6,66 @@ import {
   View,
   ScrollView,
   TextInput,
+  Alert,
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
+import * as Yup from 'yup';
 import { Container, Title, BackButton, BackButtonText } from './styles';
 import logoImg from '../../assets/logo.png';
 
 import Input from '../../components/Input';
 import Button from '../../components/Button';
 
+import getValidationErros from '../../utils/getValidationErrors';
+
+interface FormProps {
+  name: string;
+  email: string;
+  password: string;
+}
+
 const SignUp: React.FC = () => {
   const navigation = useNavigation();
   const formRef = useRef<FormHandles>(null);
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);
-  const handleOnSubmit = useCallback((data: object) => {
-    console.log(data);
+
+  const handleOnSubmit = useCallback(async (data: FormProps) => {
+    try {
+      formRef.current?.setErrors({});
+      const schema = Yup.object().shape({
+        name: Yup.string().min(3, 'Pelo menos 3 letras.'),
+        email: Yup.string()
+          .required('Digite um e-mail.')
+          .email('Digite um e-mail válido.'),
+        password: Yup.string().min(6, 'No mínimo 6 dígitos.'),
+      });
+      await schema.validate(data, { abortEarly: false });
+
+      // await api.post('/users', data);
+      // history.push('/');
+      // addToast({
+      //   title: 'Usuário criado',
+      //   type: 'success',
+      //   description: 'Você já pode realizar seu logon',
+      // });
+    } catch (error) {
+      if (error instanceof Yup.ValidationError) {
+        const errors = getValidationErros(error);
+        formRef.current?.setErrors(errors);
+        return;
+      }
+      Alert.alert(
+        'Erro na autenticação',
+        'Falha ao realizar o cadastro, tente novamente',
+      );
+    }
   }, []);
+
   return (
     <>
       <KeyboardAvoidingView

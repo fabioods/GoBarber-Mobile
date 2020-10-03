@@ -6,12 +6,13 @@ import {
   View,
   ScrollView,
   TextInput,
+  Alert,
 } from 'react-native';
-
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
+import * as Yup from 'yup';
 import {
   Container,
   Title,
@@ -24,13 +25,44 @@ import logoImg from '../../assets/logo.png';
 
 import Input from '../../components/Input';
 import Button from '../../components/Button';
+import getValidationErros from '../../utils/getValidationErrors';
+
+interface FormProps {
+  email: string;
+  password: string;
+}
 
 const SignIn: React.FC = () => {
   const navigation = useNavigation();
   const passwordInputRef = useRef<TextInput>(null);
-  const handleOnSubmit = useCallback((data: object) => {
-    console.log(data);
+
+  const handleOnSubmit = useCallback(async (data: FormProps) => {
+    try {
+      formRef.current?.setErrors({});
+      const schema = Yup.object().shape({
+        email: Yup.string()
+          .required('Digite seu email.')
+          .email('Digite um e-mail válido.'),
+        password: Yup.string().required('Digite sua senha'),
+      });
+      await schema.validate(data, { abortEarly: false });
+      // await authContext.signIn({
+      //   email: data.email,
+      //   password: data.password,
+      // });
+    } catch (error) {
+      if (error instanceof Yup.ValidationError) {
+        const errors = getValidationErros(error);
+        formRef.current?.setErrors(errors);
+        return;
+      }
+      Alert.alert(
+        'Erro na autenticação',
+        'Falha ao se autenticar, tente novamente!',
+      );
+    }
   }, []);
+
   const formRef = useRef<FormHandles>(null);
 
   return (
