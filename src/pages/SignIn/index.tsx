@@ -52,7 +52,6 @@ const SignIn: React.FC = () => {
           email: data.email,
           password: data.password,
         });
-        Alert.alert('Deu boa, vc logou');
       } catch (error) {
         if (error instanceof Yup.ValidationError) {
           const errors = getValidationErros(error);
