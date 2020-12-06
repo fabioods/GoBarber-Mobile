@@ -5,6 +5,8 @@ export const Container = styled.View`
   flex: 1;
   justify-content: center;
   padding: 0 30px ${Platform.OS === 'android' ? 150 : 40}px;
+  margin-top: 50px;
+  position: relative;
 `;
 
 export const Title = styled.Text`
@@ -18,6 +20,12 @@ export const Avatar = styled.Image`
   width: 186px;
   height: 186px;
   border-radius: 98px;
-  margin-top: 64px;
   align-self: center;
+  margin-top: -40px;
 `;
+
+export const BackButton = styled.TouchableOpacity`
+  margin-top: 120px;
+`;
+
+export const UserAvatarButton = styled.TouchableOpacity``;
