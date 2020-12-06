@@ -128,8 +128,8 @@ const CreateAppointment: React.FC = () => {
   const handleCreateAppointment = useCallback(async () => {
     try {
       const date = new Date(selectedDate);
-      date.setHours(selectedHour);
       date.setMinutes(0);
+      date.setUTCHours(selectedHour + 3);
 
       await api.post('appointments', { provider_id: selectedProvider, date });
       navigate('AppointmentCreated', { date: date.getTime() });
